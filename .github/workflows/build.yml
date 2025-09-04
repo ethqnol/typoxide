@@ -1,0 +1,87 @@
+name: build
+
+on:
+  push:
+    branches: [ main ]
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+          - os: macos-latest
+            target: x86_64-apple-darwin
+          - os: macos-latest
+            target: aarch64-apple-darwin
+
+    runs-on: ${{ matrix.os }}
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: 8
+        
+    - name: setup node
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18
+        cache: 'pnpm'
+        
+    - name: setup rust
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        targets: ${{ matrix.target }}
+        
+    - name: install deps (ubuntu only)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libwebkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev patchelf
+        
+    - name: install frontend deps
+      run: pnpm install
+      
+    - name: build app
+      run: pnpm tauri build --target ${{ matrix.target }}
+      
+    - name: upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: typoxide-${{ matrix.target }}
+        path: src-tauri/target/${{ matrix.target }}/release/bundle/
+        
+  release:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: download all artifacts
+      uses: actions/download-artifact@v4
+      
+    - name: create release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: |
+          typoxide-*/dmg/*.dmg
+          typoxide-*/msi/*.msi
+          typoxide-*/deb/*.deb
+          typoxide-*/appimage/*.AppImage
+        generate_release_notes: true
+        draft: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
