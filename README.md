@@ -1,55 +1,44 @@
-# React-tauri-vite-template
+# Typst Editor
 
-Simple template to get started with react vite and tauri, note that it has typescript support also, ~~It enables the vite-plugin-tauri, to avoid ghost terminal issue~~.
+A modern, cross-platform editor for [Typst](https://typst.app/) documents built with Tauri and React.
 
-## why ?
+## Features
 
-Because it's fun.
+- **Live Preview**: Real-time PDF preview with auto-zoom and fit-to-width
+- **Project Management**: Create new projects or open existing ones
+- **File Explorer**: Browse and manage project files with highlighting for active file
+- **Keyboard Shortcuts**: `Ctrl+S`/`Cmd+S` to save
+- **Dark Theme**: Modern dark interface optimized for productivity
 
-## Requirements:
+## Getting Started
 
-[here](https://tauri.app/v1/guides/getting-started/prerequisites)
+### Development
 
-## Instructions
+```bash
+# Install dependencies
+pnpm install
 
-1- install dependencies
-
-```sh
-#npm
-npm install
-
-#yarn
-yarn
+# Run development server
+pnpm tauri dev
 ```
 
-2- Run the App in development mode:
+### Building
 
-```sh
-#npm
-npm run tauri:dev
-
-#yarn
-yarn tauri:dev
+```bash
+# Build for production
+pnpm tauri build
 ```
 
-note that the first run will take time as tauri download and compile dependencies.
+## Usage
 
-## Production
+1. Launch the app to see the homescreen
+2. **Create New Project**: Select a folder and automatically create a `main.typ` file
+3. **Open Project**: Browse to an existing Typst project folder
+4. Edit your Typst documents with live preview
+5. Export to PDF when ready
 
-when you are happy with the results and ready to ship your useless app.
+## Requirements
 
-run:
-
-```sh
-#npm
-npm run tauri:build
-
-#yarn
-yarn tauri:build
-```
-
-## Note:
-
-tested on:
-
-- windows 10
+- Node.js 18+
+- Rust toolchain
+- Platform-specific dependencies for Tauri
